@@ -1,0 +1,49 @@
+.category-detail-card {
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.category-detail-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #dee2e6;
+  font-size: 16px;
+  font-weight: 700;
+  color: #212529;
+}
+
+.category-detail-body {
+  padding: 24px;
+}
+
+.detail-row {
+  display: flex;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f3f5;
+  font-size: 14px;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  width: 160px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.detail-value {
+  flex: 1;
+  color: #212529;
+}
+
+.category-detail-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}

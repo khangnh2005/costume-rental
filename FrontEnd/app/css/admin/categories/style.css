@@ -1,0 +1,142 @@
+/* Card danh sách */
+.category-card {
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.category-card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #dee2e6;
+  font-size: 16px;
+  font-weight: 700;
+  color: #212529; 
+}
+
+.category-card-body {
+  padding: 20px;
+}
+
+/* Khung nút thêm mới */
+.action-top-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.btn-add-new {
+  display: inline-block;
+  padding: 6px 14px;
+  border: 1px solid #198754;
+  color: #198754;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: transparent;
+  transition: all 0.2s;
+}
+
+.btn-add-new:hover {
+  background-color: #198754;
+  color: #ffffff;
+}
+
+/* Table */
+.category-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+  color: #212529; 
+}
+
+.category-table th {
+  padding: 12px 10px;
+  border-bottom: 2px solid #343a40;
+  font-weight: 700;
+  color: #212529; 
+}
+
+.category-table td {
+  padding: 14px 10px;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: middle;
+  color: #212529;
+}
+
+.category-name {
+  font-weight: 600;
+  color: #212529;
+}
+
+.category-slug {
+  color: #0d6efd;
+  font-family: monospace;
+  font-size: 13px;
+}
+
+.category-desc {
+  color: #495057; 
+  line-height: 1.4;
+}
+
+/* Trạng thái */
+.badge-status {
+  background-color: #198754;
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+/* Nút hành động */
+.action-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-sm {
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-detail {
+  background-color: #6c757d;
+  color: #ffffff;
+}
+
+.btn-edit {
+  background-color: #ffc107;
+  color: #000000;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: #ffffff;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.btn-sm {
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+} 
