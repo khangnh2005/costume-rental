@@ -34,6 +34,7 @@ const uploadImage = async (buffer) => {
     return result.secure_url || result.url;
 };
 
+// Bắt buộc export dạng object chứa uploadImage
 module.exports = {
     streamUpload,
     uploadImage

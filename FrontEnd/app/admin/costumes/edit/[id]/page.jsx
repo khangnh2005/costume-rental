@@ -21,11 +21,26 @@ export default function EditCostumePage() {
     description: ''
   });
 
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState('');
+  // Quản lý ảnh: ảnh đã lưu trên Cloudinary và ảnh mới chuẩn bị tải lên
+  const [existingImages, setExistingImages] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [newPreviews, setNewPreviews] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Hàm dọn sạch state và input file
+  const resetUploadState = () => {
+    setSelectedFiles([]);
+    setNewPreviews((prev) => {
+      prev.forEach((url) => URL.revokeObjectURL(url));
+      return [];
+    });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   useEffect(() => {
     const pathSegments = window.location.pathname.split('/');
@@ -33,9 +48,11 @@ export default function EditCostumePage() {
 
     if (!id) return;
 
+    // Reset sạch trạng thái ảnh upload ngay khi mở trang
+    resetUploadState();
+
     const fetchData = async () => {
       try {
-        // Lấy danh mục và sizes
         const createMetaRes = await axios.get('http://localhost:5000/admin/costumes/create');
         let sizeList = [];
         if (createMetaRes.data.success) {
@@ -44,7 +61,6 @@ export default function EditCostumePage() {
           setAvailableSizes(sizeList);
         }
 
-        // Lấy dữ liệu chi tiết của trang phục cần sửa
         const costumeRes = await axios.get(`http://localhost:5000/admin/costumes/detail/${id}`);
         if (costumeRes.data.success) {
           const item = costumeRes.data.data;
@@ -55,7 +71,18 @@ export default function EditCostumePage() {
             dailyRentalPrice: item.dailyRentalPrice || '',
             description: item.description || ''
           });
-          setPreviewUrl(item.image || '');
+
+          // Nạp chính xác mảng ảnh từ DB
+          if (Array.isArray(item.images) && item.images.length > 0) {
+            setExistingImages(item.images);
+          } else if (item.image) {
+            setExistingImages([item.image]);
+          } else {
+            setExistingImages([]);
+          }
+
+          // Đảm bảo không còn vướng ảnh mới nào trong bộ nhớ
+          resetUploadState();
 
           // Map số lượng theo từng size
           const currentQty = {};
@@ -75,6 +102,11 @@ export default function EditCostumePage() {
     };
 
     fetchData();
+
+    // Dọn bộ nhớ blob URL khi component unmount
+    return () => {
+      resetUploadState();
+    };
   }, []);
 
   const handleChange = (e) => {
@@ -85,11 +117,12 @@ export default function EditCostumePage() {
     }));
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
+  const handleFilesChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      setSelectedFiles((prev) => [...prev, ...files]);
+      const urls = files.map((f) => URL.createObjectURL(f));
+      setNewPreviews((prev) => [...prev, ...urls]);
     }
   };
 
@@ -99,12 +132,16 @@ export default function EditCostumePage() {
     }
   };
 
-  const handleRemoveImage = () => {
-    setSelectedFile(null);
-    setPreviewUrl('');
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+  const handleRemoveExistingImage = (indexToRemove) => {
+    setExistingImages((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const handleRemoveNewImage = (indexToRemove) => {
+    if (newPreviews[indexToRemove]) {
+      URL.revokeObjectURL(newPreviews[indexToRemove]);
     }
+    setSelectedFiles((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+    setNewPreviews((prev) => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
   const handleSizeQuantityChange = (sizeId, value) => {
@@ -143,8 +180,8 @@ export default function EditCostumePage() {
       return;
     }
 
-    if (!previewUrl && !selectedFile) {
-      setErrorMessage('Vui lòng chọn hình ảnh cho trang phục.');
+    if (existingImages.length === 0 && selectedFiles.length === 0) {
+      setErrorMessage('Vui lòng giữ lại hoặc tải lên ít nhất 1 hình ảnh.');
       return;
     }
 
@@ -175,10 +212,13 @@ export default function EditCostumePage() {
       dataPayload.append('description', formData.description.trim());
       dataPayload.append('sizes', JSON.stringify(formattedSizes));
 
-      // Chỉ gửi file nếu người dùng chọn đổi ảnh mới
-      if (selectedFile) {
-        dataPayload.append('image', selectedFile);
-      }
+      // Gửi danh sách các ảnh cũ được giữ lại
+      dataPayload.append('existingImages', JSON.stringify(existingImages));
+
+      // Append từng file ảnh mới được thêm
+      selectedFiles.forEach((file) => {
+        dataPayload.append('images', file);
+      });
 
       const res = await axios.patch(`http://localhost:5000/admin/costumes/edit/${id}`, dataPayload, {
         headers: {
@@ -187,6 +227,8 @@ export default function EditCostumePage() {
       });
 
       if (res.data.success) {
+        // Giải phóng URL bộ nhớ và dọn sạch state
+        resetUploadState();
         router.push('/admin/costumes');
         router.refresh();
       } else {
@@ -279,14 +321,15 @@ export default function EditCostumePage() {
             </div>
 
             <div className="form-group">
-              <label>Hình Ảnh *</label>
+              <label>Album hình ảnh * (Đang có & Tải thêm)</label>
               <div className="file-upload-box">
                 <input
                   type="file"
+                  multiple
                   ref={fileInputRef}
                   accept="image/*"
                   className="file-input-hidden"
-                  onChange={handleFileChange}
+                  onChange={handleFilesChange}
                 />
 
                 <button
@@ -294,22 +337,42 @@ export default function EditCostumePage() {
                   className="btn-upload-file"
                   onClick={handleTriggerFileInput}
                 >
-                  📁 {previewUrl ? 'Đổi hình ảnh khác' : 'Chọn hình ảnh từ máy'}
+                  📁 Chọn thêm ảnh từ máy
                 </button>
 
-                {previewUrl && (
-                  <div className="image-preview-container">
-                    <img src={previewUrl} alt="Preview" className="image-preview" />
-                    <button
-                      type="button"
-                      className="btn-remove-image"
-                      onClick={handleRemoveImage}
-                      title="Xóa ảnh"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                )}
+                <div className="image-album-grid">
+                  {/* Ảnh cũ đã lưu trên DB */}
+                  {existingImages.map((url, idx) => (
+                    <div key={`exist-${idx}`} className="image-thumb-card">
+                      <img src={url} alt={`Saved ${idx}`} className="image-preview" />
+                      <span className="badge-exist-label">Đã lưu</span>
+                      <button
+                        type="button"
+                        className="btn-remove-image"
+                        onClick={() => handleRemoveExistingImage(idx)}
+                        title="Xóa ảnh này"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* Ảnh mới vừa chọn từ máy (chưa submit) */}
+                  {newPreviews.map((url, idx) => (
+                    <div key={`new-${idx}`} className="image-thumb-card new-upload">
+                      <img src={url} alt={`New ${idx}`} className="image-preview" />
+                      <span className="badge-new-label">Mới</span>
+                      <button
+                        type="button"
+                        className="btn-remove-image"
+                        onClick={() => handleRemoveNewImage(idx)}
+                        title="Hủy ảnh này"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

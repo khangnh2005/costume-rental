@@ -7,6 +7,8 @@ import '@/app/css/admin/costumes/style.css';
 export default function CostumeListPage() {
   const [costumes, setCostumes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' hoặc 'table'
 
   const fetchCostumes = async () => {
     try {
@@ -41,121 +43,220 @@ export default function CostumeListPage() {
     }
   };
 
-  return (
-    <div className="costume-card">
-      <div className="costume-card-header">
-        Danh sách trang phục
-      </div>
+  const filteredCostumes = costumes.filter((item) =>
+    (item.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (item.categoryName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (item.color || '').toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-      <div className="costume-card-body">
-        <div className="action-top-bar">
-          <Link href="/admin/costumes/create" className="btn-add-new">
+  return (
+    <div className="costume-page-container">
+      {/* Header bar */}
+      <div className="costume-header-card">
+        <div className="costume-header-title">
+          <h2>Quản lý Trang Phục Cho Thuê</h2>
+          <span>Tổng số: <strong>{filteredCostumes.length}</strong> trang phục</span>
+        </div>
+
+        <div className="costume-header-actions">
+          <input
+            type="text"
+            className="costume-search-input"
+            placeholder="Tìm theo tên, màu, danh mục..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+
+          <div className="view-mode-toggle">
+            <button
+              type="button"
+              className={`btn-toggle-view ${viewMode === 'grid' ? 'active' : ''}`}
+              onClick={() => setViewMode('grid')}
+            >
+              ⊞ Dạng Thẻ
+            </button>
+            <button
+              type="button"
+              className={`btn-toggle-view ${viewMode === 'table' ? 'active' : ''}`}
+              onClick={() => setViewMode('table')}
+            >
+              ☰ Dạng Bảng
+            </button>
+          </div>
+
+          <Link href="/admin/costumes/create" className="btn-add-primary">
             + Thêm trang phục
           </Link>
         </div>
-
-        <table className="costume-table">
-          <thead>
-            <tr>
-              <th style={{ width: '50px' }}>STT</th>
-              <th style={{ width: '80px' }}>Ảnh</th>
-              <th>Tên trang phục</th>
-              <th>Danh mục</th>
-              <th>Giá thuê/ngày</th>
-              <th>Size & Tồn kho</th>
-              <th style={{ width: '80px' }}>Tổng kho</th>
-              <th style={{ width: '100px' }}>Trạng thái</th>
-              <th style={{ width: '180px' }}>Hành động</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="9" className="text-center" style={{ padding: '24px' }}>
-                  Đang tải dữ liệu...
-                </td>
-              </tr>
-            ) : costumes.length > 0 ? (
-              costumes.map((item, index) => (
-                <tr key={item._id}>
-                  <td>{index + 1}</td>
-                  <td>
-                    {item.image ? (
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="costume-thumb"
-                      />
-                    ) : (
-                      <div className="no-image">No Image</div>
-                    )}
-                  </td>
-                  <td>
-                    <div className="costume-name">{item.title}</div>
-                    {item.color && (
-                      <div className="costume-color">Màu: {item.color}</div>
-                    )}
-                  </td>
-                  <td>{item.categoryName || item.categoryTitle || '—'}</td>
-                  <td>
-                    {item.dailyRentalPrice
-                      ? `${item.dailyRentalPrice.toLocaleString('vi-VN')} đ`
-                      : '0 đ'}
-                  </td>
-                  <td>
-                    <div className="size-badge-list">
-                      {item.sizes && item.sizes.length > 0
-                        ? item.sizes.map((s, idx) => (
-                            <span key={idx} className="size-badge">
-                              {s.title}: {s.quantity}
-                            </span>
-                          ))
-                        : '—'}
-                    </div>
-                  </td>
-                  <td>
-                    <strong>{item.quantity ?? 0}</strong>
-                  </td>
-                  <td>
-                    <span className="badge-status">
-                      Hoạt động
-                    </span>
-                  </td>
-                  <td>
-                    <div className="action-buttons">
-                      <Link
-                        href={`/admin/costumes/detail/${item._id}`}
-                        className="btn-sm btn-detail"
-                      >
-                        Chi tiết
-                      </Link>
-                      <Link
-                        href={`/admin/costumes/edit/${item._id}`}
-                        className="btn-sm btn-edit"
-                      >
-                        Sửa
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(item._id, item.title)}
-                        className="btn-sm btn-delete"
-                      >
-                        Xóa
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="9" className="text-center" style={{ padding: '24px' }}>
-                  Chưa có trang phục nào trong danh sách.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
       </div>
+
+      {/* Hiển thị danh sách */}
+      {loading ? (
+        <div className="costume-state-box">Đang tải dữ liệu...</div>
+      ) : filteredCostumes.length === 0 ? (
+        <div className="costume-state-box">Không có trang phục nào phù hợp.</div>
+      ) : viewMode === 'grid' ? (
+        /* Dạng Thẻ (Card Grid) */
+        <div className="costume-grid">
+          {filteredCostumes.map((item) => {
+            const displayImage = (item.images && item.images.length > 0) ? item.images[0] : item.image;
+            const totalImages = item.images?.length || (item.image ? 1 : 0);
+
+            return (
+              <div key={item._id} className="costume-card-item">
+                <div className="card-thumb-wrapper">
+                  {displayImage ? (
+                    <img src={displayImage} alt={item.title} className="card-thumb-img" />
+                  ) : (
+                    <div className="card-no-img">Chưa có hình ảnh</div>
+                  )}
+
+                  {totalImages > 0 && (
+                    <span className="badge-image-count">📷 {totalImages} ảnh</span>
+                  )}
+
+                  <span className="badge-category-tag">
+                    {item.categoryName || 'Chưa phân loại'}
+                  </span>
+                </div>
+
+                <div className="card-info-content">
+                  <h3 className="card-costume-title">{item.title}</h3>
+
+                  <div className="card-price-color-row">
+                    <span className="card-price-text">
+                      {item.dailyRentalPrice ? `${item.dailyRentalPrice.toLocaleString('vi-VN')} đ` : '0 đ'}
+                      <span className="card-price-unit"> /ngày</span>
+                    </span>
+                    {item.color && (
+                      <span className="card-color-tag">Màu: {item.color}</span>
+                    )}
+                  </div>
+
+                  <div className="card-sizes-block">
+                    <div className="sizes-summary-row">
+                      <span>Size & tồn kho:</span>
+                      <strong>Tổng: {item.quantity ?? 0} bộ</strong>
+                    </div>
+                    <div className="sizes-badge-group">
+                      {item.sizes && item.sizes.length > 0 ? (
+                        item.sizes.map((s, idx) => (
+                          <span key={idx} className="size-pill">
+                            {s.title}: <strong>{s.quantity}</strong>
+                          </span>
+                        ))
+                      ) : (
+                        <span style={{ fontSize: '12px', color: '#94a3b8' }}>Chưa thiết lập size</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="card-actions-row">
+                    <Link
+                      href={`/admin/costumes/detail/${item._id}`}
+                      className="btn-card-action btn-card-detail"
+                    >
+                      Chi tiết
+                    </Link>
+                    <Link
+                      href={`/admin/costumes/edit/${item._id}`}
+                      className="btn-card-action btn-card-edit"
+                    >
+                      Sửa
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(item._id, item.title)}
+                      className="btn-card-action btn-card-delete"
+                    >
+                      Xóa
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        /* Dạng Bảng (Table View) */
+        <div className="costume-table-card">
+          <table className="costume-data-table">
+            <thead>
+              <tr>
+                <th style={{ width: '50px' }}>STT</th>
+                <th style={{ width: '90px' }}>Ảnh</th>
+                <th>Tên trang phục</th>
+                <th>Danh mục</th>
+                <th>Giá thuê/ngày</th>
+                <th>Kích cỡ & Tồn kho</th>
+                <th style={{ width: '90px' }}>Tổng kho</th>
+                <th style={{ width: '170px' }}>Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredCostumes.map((item, index) => {
+                const displayImage = (item.images && item.images.length > 0) ? item.images[0] : item.image;
+                return (
+                  <tr key={item._id}>
+                    <td>{index + 1}</td>
+                    <td>
+                      {displayImage ? (
+                        <div className="table-thumb-wrapper">
+                          <img src={displayImage} alt={item.title} className="table-thumb-img" />
+                          {item.images?.length > 1 && (
+                            <span className="table-photo-badge">+{item.images.length}</span>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="table-no-img">No img</div>
+                      )}
+                    </td>
+                    <td>
+                      <div className="table-costume-name">{item.title}</div>
+                      {item.color && <div className="table-costume-color">Màu: {item.color}</div>}
+                    </td>
+                    <td>
+                      <span className="category-pill">{item.categoryName || '—'}</span>
+                    </td>
+                    <td className="price-text-highlight">
+                      {item.dailyRentalPrice ? `${item.dailyRentalPrice.toLocaleString('vi-VN')} đ` : '0 đ'}
+                    </td>
+                    <td>
+                      <div className="sizes-badge-group">
+                        {item.sizes && item.sizes.length > 0
+                          ? item.sizes.map((s, idx) => (
+                              <span key={idx} className="size-pill">
+                                {s.title}: <strong>{s.quantity}</strong>
+                              </span>
+                            ))
+                          : '—'}
+                      </div>
+                    </td>
+                    <td><strong>{item.quantity ?? 0}</strong></td>
+                    <td>
+                      <div className="table-actions-group">
+                        <Link href={`/admin/costumes/detail/${item._id}`} className="table-btn table-btn-detail">
+                          Chi tiết
+                        </Link>
+                        <Link href={`/admin/costumes/edit/${item._id}`} className="table-btn table-btn-edit">
+                          Sửa
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(item._id, item.title)}
+                          className="table-btn table-btn-delete"
+                        >
+                          Xóa
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

@@ -8,18 +8,24 @@ const uploadCloud = require('../../middlewares/admin/uploadCloud.middleware');
 
 router.get('/', costumeController.index);
 router.get('/create', costumeController.create);
-router.post('/create',
-    upload.single('image'),
-    uploadCloud.uploadSingle, 
+
+// Đổi upload.single('image') thành upload.array('images', 6) và dùng uploadFields
+router.post(
+    '/create',
+    upload.array('images', 6),
+    uploadCloud.uploadFields,
     costumeController.createPost
 );
+
 router.get('/detail/:id', costumeController.detail);
+
 router.patch(
     '/edit/:id',
-    upload.single('image'),
-    uploadCloud.uploadSingle,
+    upload.array('images', 6),
+    uploadCloud.uploadFields,
     costumeController.editPatch
 );
+
 router.patch('/delete/:id', costumeController.deleteItem);
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const Costume = require('../../models/admin/costume.model');
 const Size = require('../../models/admin/size.model');
 const Category = require('../../models/admin/category.model');
+const { createSelectTree } = require('../../helpers/createTree');
 
 module.exports.index = async (req, res) => {
     try {
@@ -51,11 +52,14 @@ module.exports.create = async (req, res) => {
         const sizes = await Size.find({ deleted: false });
         const categories = await Category.find({ deleted: false });
 
+        // Dùng helper để tạo cây danh mục phân cấp có tiền tố '-- '
+        const categoryTree = createSelectTree(categories);
+
         res.json({
             success: true,
             data: {
                 sizes,
-                categories
+                categories: categoryTree
             }
         });
     } catch (error) {
@@ -68,7 +72,21 @@ module.exports.create = async (req, res) => {
 
 module.exports.createPost = async (req, res) => {
     try {
-        const { title, categoryId, color, dailyRentalPrice, description, image } = req.body;
+        const { title, categoryId, color, dailyRentalPrice, description } = req.body;
+
+        if (!title || !title.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: 'Tên trang phục không được để trống'
+            });
+        }
+
+        if (!categoryId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Vui lòng chọn danh mục trang phục'
+            });
+        }
 
         let parsedSizes = [];
         if (req.body.sizes) {
@@ -92,14 +110,22 @@ module.exports.createPost = async (req, res) => {
 
         const totalQuantity = validSizes.reduce((sum, item) => sum + item.quantity, 0);
 
+        // Lấy danh sách nhiều ảnh từ middleware uploadFields
+        let imageList = [];
+        if (Array.isArray(req.body.images)) {
+            imageList = req.body.images;
+        } else if (req.body.image) {
+            imageList = [req.body.image];
+        }
+
         const newCostume = new Costume({
             ownerId: 'ADMIN',
-            title,
+            title: title.trim(),
             categoryId,
-            color,
+            color: color ? color.trim() : '',
             dailyRentalPrice: Number(dailyRentalPrice) || 0,
-            description,
-            image: image || '',
+            description: description ? description.trim() : '',
+            images: imageList,
             sizes: validSizes,
             quantity: totalQuantity
         });
@@ -123,12 +149,10 @@ module.exports.deleteItem = async (req, res) => {
     try {
         const id = req.params.id;
 
+        // Xóa mềm để đồng bộ toàn hệ thống
         await Costume.updateOne(
             { _id: id },
-            {
-                deleted: true,
-                deletedAt: new Date()
-            }
+            { deleted: true }
         );
 
         res.json({
@@ -156,7 +180,7 @@ module.exports.detail = async (req, res) => {
         }
 
         const category = await Category.findOne({ _id: costume.categoryId });
-        const sizes = await Size.find();
+        const sizes = await Size.find({ deleted: false });
 
         const sizeMap = {};
         sizes.forEach(s => {
@@ -189,7 +213,7 @@ module.exports.detail = async (req, res) => {
 module.exports.editPatch = async (req, res) => {
     try {
         const id = req.params.id;
-        const { title, categoryId, color, dailyRentalPrice, description, image } = req.body;
+        const { title, categoryId, color, dailyRentalPrice, description } = req.body;
 
         if (!title || !title.trim()) {
             return res.status(400).json({
@@ -235,6 +259,22 @@ module.exports.editPatch = async (req, res) => {
             });
         }
 
+        // Lấy danh sách ảnh cũ người dùng giữ lại
+        let keptImages = [];
+        if (req.body.existingImages) {
+            try {
+                keptImages = JSON.parse(req.body.existingImages);
+            } catch (e) {
+                keptImages = [];
+            }
+        }
+
+        // Lấy danh sách ảnh mới do middleware uploadFields đẩy lên
+        const newImages = Array.isArray(req.body.images) ? req.body.images : [];
+
+        // Hợp nhất mảng ảnh
+        const finalImages = [...keptImages, ...newImages];
+
         const updateData = {
             title: title.trim(),
             categoryId,
@@ -245,9 +285,8 @@ module.exports.editPatch = async (req, res) => {
             quantity: totalQuantity
         };
 
-        // Nếu có upload ảnh mới từ middleware multer/cloudinary thì mới update image
-        if (image) {
-            updateData.image = image;
+        if (finalImages.length > 0) {
+            updateData.images = finalImages;
         }
 
         await Costume.updateOne({ _id: id }, updateData);
