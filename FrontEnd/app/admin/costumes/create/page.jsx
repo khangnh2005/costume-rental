@@ -144,7 +144,7 @@ export default function CreateCostumePage() {
               name="title"
               value={formData.title}
               onChange={handleChange}
-              placeholder="VD: Áo Dài Nam 2 Tà - Trắng"
+              placeholder="Nhập tên trang phục"
               style={{ width: '100%', padding: '10px', border: '1px solid #ced4da', borderRadius: '4px' }}
             />
           </div>
