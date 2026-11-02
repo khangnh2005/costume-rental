@@ -1,0 +1,14 @@
+{
+  "0": "BackEnd/package.json",
+  "1": "next",
+  "2": "FrontEnd/package.json",
+  "3": "costume.controller.js",
+  "4": "compilerOptions",
+  "5": "costume.route.js",
+  "6": "category.controller.js",
+  "7": "layout.tsx",
+  "8": "uploadToCloudinary.js",
+  "9": "scripts",
+  "10": "README.md",
+  "11": "AGENTS.md"
+}

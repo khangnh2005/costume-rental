@@ -1,11 +1,13 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Link from 'next/link';
+import '@/app/css/admin/costumes/create.css';
 
 export default function CreateCostumePage() {
   const router = useRouter();
+  const fileInputRef = useRef(null);
 
   const [categories, setCategories] = useState([]);
   const [availableSizes, setAvailableSizes] = useState([]);
@@ -24,7 +26,29 @@ export default function CreateCostumePage() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Hàm reset toàn bộ dữ liệu của form về trạng thái ban đầu
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      categoryId: '',
+      color: '',
+      dailyRentalPrice: '',
+      description: ''
+    });
+    setSelectedSizes({});
+    setImageFiles([]);
+    setImagePreviews((prev) => {
+      prev.forEach((url) => URL.revokeObjectURL(url));
+      return [];
+    });
+    setErrorMessage('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   useEffect(() => {
+    resetForm();
     const fetchData = async () => {
       try {
         const res = await axios.get('http://localhost:5000/admin/costumes/create');
@@ -37,6 +61,10 @@ export default function CreateCostumePage() {
       }
     };
     fetchData();
+
+    return () => {
+      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+    };
   }, []);
 
   const handleChange = (e) => {
@@ -44,20 +72,46 @@ export default function CreateCostumePage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Xử lý chọn nhiều ảnh
-  const handleImagesChange = (e) => {
+  // Xử lý chọn thêm ảnh từ máy (hỗ trợ chọn nhiều lần liên tiếp, không bị ghi đè)
+  const handleFilesChange = (e) => {
     const files = Array.from(e.target.files || []);
     if (files.length > 0) {
-      setImageFiles(files);
+      setImageFiles((prev) => [...prev, ...files]);
       const previewUrls = files.map((file) => URL.createObjectURL(file));
-      setImagePreviews(previewUrls);
+      setImagePreviews((prev) => [...prev, ...previewUrls]);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
+  const handleTriggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  // Xử lý xóa từng ảnh xem trước
+  const handleRemoveImage = (indexToRemove) => {
+    if (imagePreviews[indexToRemove]) {
+      URL.revokeObjectURL(imagePreviews[indexToRemove]);
+    }
+    setImageFiles((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+    setImagePreviews((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
   const handleSizeQuantityChange = (sizeId, quantity) => {
+    if (quantity === '') {
+      setSelectedSizes((prev) => ({
+        ...prev,
+        [sizeId]: ''
+      }));
+      return;
+    }
+    const parsed = parseInt(quantity, 10);
     setSelectedSizes((prev) => ({
       ...prev,
-      [sizeId]: Math.max(0, parseInt(quantity, 10) || 0)
+      [sizeId]: isNaN(parsed) ? '' : Math.max(0, parsed)
     }));
   };
 
@@ -75,11 +129,17 @@ export default function CreateCostumePage() {
       return;
     }
 
+    const price = Number(formData.dailyRentalPrice);
+    if (!formData.dailyRentalPrice || isNaN(price) || price <= 0) {
+      setErrorMessage('Vui lòng nhập giá thuê mỗi ngày lớn hơn 0');
+      return;
+    }
+
     const sizesPayload = Object.keys(selectedSizes)
-      .filter((sId) => selectedSizes[sId] > 0)
+      .filter((sId) => Number(selectedSizes[sId]) > 0)
       .map((sId) => ({
         sizeId: sId,
-        quantity: selectedSizes[sId]
+        quantity: Number(selectedSizes[sId])
       }));
 
     if (sizesPayload.length === 0) {
@@ -111,6 +171,8 @@ export default function CreateCostumePage() {
       });
 
       if (res.data.success) {
+        // Reset sạch toàn bộ form và input trước khi chuyển trang
+        resetForm();
         router.push('/admin/costumes');
         router.refresh();
       } else {
@@ -124,39 +186,42 @@ export default function CreateCostumePage() {
   };
 
   return (
-    <div style={{ maxWidth: '800px', margin: '24px auto', background: '#fff', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-      <div style={{ padding: '16px 24px', borderBottom: '1px solid #edf2f7', fontWeight: 600, fontSize: '18px' }}>
+    <div className="costume-create-card">
+      <div className="costume-create-header">
         Thêm mới trang phục
       </div>
 
-      <div style={{ padding: '24px' }}>
+      <div className="costume-create-body">
         {errorMessage && (
-          <div style={{ padding: '12px', background: '#f8d7da', color: '#842029', borderRadius: '4px', marginBottom: '16px' }}>
+          <div className="alert-error">
             {errorMessage}
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', fontWeight: 600, marginBottom: '6px' }}>Tên trang phục *</label>
+          <div className="form-group">
+            <label htmlFor="title">Tên trang phục *</label>
             <input
               type="text"
+              id="title"
               name="title"
+              className="form-control"
+              placeholder="Nhập tên trang phục (vd: Áo dài ngũ thân...)"
               value={formData.title}
               onChange={handleChange}
-              placeholder="Nhập tên trang phục"
-              style={{ width: '100%', padding: '10px', border: '1px solid #ced4da', borderRadius: '4px' }}
+              autoComplete="off"
             />
           </div>
 
-          <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
-            <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', fontWeight: 600, marginBottom: '6px' }}>Danh mục phân loại *</label>
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="categoryId">Danh mục *</label>
               <select
+                id="categoryId"
                 name="categoryId"
+                className="form-control"
                 value={formData.categoryId}
                 onChange={handleChange}
-                style={{ width: '100%', padding: '10px', border: '1px solid #ced4da', borderRadius: '4px' }}
               >
                 <option value="">-- Chọn danh mục --</option>
                 {categories.map((cat) => (
@@ -166,98 +231,110 @@ export default function CreateCostumePage() {
                 ))}
               </select>
             </div>
-            <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', fontWeight: 600, marginBottom: '6px' }}>Màu sắc</label>
+
+            <div className="form-group">
+              <label htmlFor="color">Màu sắc</label>
               <input
                 type="text"
+                id="color"
                 name="color"
+                className="form-control"
+                placeholder="Nhập màu (vd: Đỏ, Xanh ngọc...)"
                 value={formData.color}
                 onChange={handleChange}
-                placeholder="VD: Trắng..."
-                style={{ width: '100%', padding: '10px', border: '1px solid #ced4da', borderRadius: '4px' }}
               />
             </div>
           </div>
 
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', fontWeight: 600, marginBottom: '6px' }}>Giá thuê / ngày (VNĐ) *</label>
-            <input
-              type="number"
-              name="dailyRentalPrice"
-              value={formData.dailyRentalPrice}
-              onChange={handleChange}
-              placeholder="VD: 150000"
-              style={{ width: '100%', padding: '10px', border: '1px solid #ced4da', borderRadius: '4px' }}
-            />
-          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="dailyRentalPrice">Giá thuê / ngày (VNĐ) *</label>
+              <input
+                type="number"
+                id="dailyRentalPrice"
+                name="dailyRentalPrice"
+                className="form-control"
+                placeholder="vd: 150000"
+                min="1"
+                value={formData.dailyRentalPrice}
+                onChange={handleChange}
+              />
+            </div>
 
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', fontWeight: 600, marginBottom: '6px' }}>Hình ảnh trang phục (Chọn nhiều ảnh) *</label>
-            <input
-              type="file"
-              name="images"
-              multiple
-              accept="image/*"
-              onChange={handleImagesChange}
-              style={{ display: 'block', marginBottom: '10px' }}
-            />
-            {imagePreviews.length > 0 && (
-              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '10px' }}>
-                {imagePreviews.map((url, idx) => (
-                  <img
-                    key={idx}
-                    src={url}
-                    alt={`Preview ${idx}`}
-                    style={{ width: '90px', height: '110px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #ddd' }}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+            <div className="form-group">
+              <label>Album hình ảnh * (Thêm mới)</label>
+              <div className="file-upload-box">
+                <input
+                  type="file"
+                  multiple
+                  ref={fileInputRef}
+                  accept="image/*"
+                  className="file-input-hidden"
+                  onChange={handleFilesChange}
+                />
 
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', fontWeight: 600, marginBottom: '6px' }}>Nhập số lượng tồn kho theo Size:</label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '12px', background: '#f8f9fa', padding: '12px', borderRadius: '4px' }}>
-              {availableSizes.map((sz) => (
-                <div key={sz._id} style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 500, marginBottom: '4px' }}>Size {sz.title}:</span>
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder="Nhập số lượng"
-                    value={selectedSizes[sz._id] || ''}
-                    onChange={(e) => handleSizeQuantityChange(sz._id, e.target.value)}
-                    style={{ padding: '6px', border: '1px solid #ced4da', borderRadius: '4px' }}
-                  />
+                <button
+                  type="button"
+                  className="btn-upload-file"
+                  onClick={handleTriggerFileInput}
+                >
+                  📁 Chọn thêm ảnh từ máy
+                </button>
+
+                <div className="image-album-grid">
+                  {imagePreviews.map((url, idx) => (
+                    <div key={`img-${idx}`} className="image-thumb-card">
+                      <img src={url} alt={`Upload ${idx}`} className="image-preview" />
+                      <button
+                        type="button"
+                        className="btn-remove-image"
+                        onClick={() => handleRemoveImage(idx)}
+                        title="Xóa ảnh này"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
 
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', fontWeight: 600, marginBottom: '6px' }}>Mô tả chi tiết</label>
+          <div className="sizes-section">
+            <div className="sizes-section-title">Số lượng tồn kho theo Size:</div>
+            {availableSizes.map((s) => (
+              <div key={s._id} className="size-item-row">
+                <span className="size-label">{s.title}:</span>
+                <input
+                  type="number"
+                  min="0"
+                  className="form-control size-input-qty"
+                  placeholder="0"
+                  value={selectedSizes[s._id] ?? ''}
+                  onChange={(e) => handleSizeQuantityChange(s._id, e.target.value)}
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="description">Mô tả chi tiết</label>
             <textarea
+              id="description"
               name="description"
+              className="form-control"
+              placeholder="Nhập chất liệu, phụ kiện đi kèm, lưu ý..."
               rows={4}
               value={formData.description}
               onChange={handleChange}
-              placeholder="Nhập chất liệu, phụ kiện đi kèm, lưu ý..."
-              style={{ width: '100%', padding: '10px', border: '1px solid #ced4da', borderRadius: '4px' }}
             />
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '24px' }}>
-            <Link
-              href="/admin/costumes"
-              style={{ padding: '8px 18px', background: '#6c757d', color: '#fff', borderRadius: '4px', textDecoration: 'none' }}
-            >
+          <div className="form-actions">
+            <Link href="/admin/costumes" className="btn-secondary">
               Quay lại
             </Link>
-            <button
-              type="submit"
-              disabled={loading}
-              style={{ padding: '8px 18px', background: '#198754', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-            >
+            <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? 'Đang lưu...' : 'Lưu trang phục'}
             </button>
           </div>
