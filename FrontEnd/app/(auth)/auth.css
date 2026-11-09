@@ -1,0 +1,239 @@
+/* ===================================================
+   AUTH DEDICATED LAYOUT STYLES (LOGIN & REGISTER)
+   =================================================== */
+
+.auth-layout-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: radial-gradient(circle at 10% 20%, #f1f5f9 0%, #f8fafc 50%, #eff6ff 100%);
+  color: #1e293b;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ================= AUTH HEADER ================= */
+.auth-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 14px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.auth-header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Logo */
+.auth-logo-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.auth-logo-link:hover {
+  opacity: 0.9;
+}
+
+.auth-logo-badge {
+  background: #d81b60;
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 1.5px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(216, 27, 96, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-brand-name {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.auth-brand-sub {
+  font-size: 11px;
+  font-weight: 600;
+  color: #d81b60;
+  letter-spacing: 1px;
+}
+
+/* Header Actions */
+.auth-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.auth-hotline-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  border: 1px solid #e2e8f0;
+}
+
+.auth-hotline-pill strong {
+  color: #d81b60;
+}
+
+.hotline-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #22c55e;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+}
+
+.auth-back-home-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.auth-back-home-btn:hover {
+  background: #f8fafc;
+  color: #1e40af;
+  border-color: #93c5fd;
+  transform: translateX(-2px);
+}
+
+/* ================= MAIN CONTENT ================= */
+.auth-main-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 20px;
+  width: 100%;
+}
+
+.auth-content-box {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+/* Tùy chỉnh card container khi ở trong Auth Layout */
+.auth-layout-wrapper .register-page-wrapper {
+  margin: 0 auto;
+  padding: 0;
+  max-width: 100%;
+}
+
+.auth-layout-wrapper .register-container {
+  box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.12), 0 8px 16px -4px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+/* ================= AUTH FOOTER ================= */
+.auth-footer {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid #e2e8f0;
+  padding: 18px 24px;
+}
+
+.auth-footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.auth-footer-copy {
+  margin: 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.auth-footer-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.auth-footer-links a {
+  color: #475569;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.auth-footer-links a:hover {
+  color: #1e40af;
+  text-decoration: underline;
+}
+
+.auth-footer-sep {
+  color: #cbd5e1;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .auth-header {
+    padding: 12px 16px;
+  }
+
+  .auth-hotline-pill {
+    display: none;
+  }
+
+  .auth-brand-name {
+    font-size: 15px;
+  }
+
+  .auth-brand-sub {
+    font-size: 10px;
+  }
+
+  .auth-main-area {
+    padding: 20px 12px;
+  }
+
+  .auth-footer-inner {
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    gap: 8px;
+  }
+}

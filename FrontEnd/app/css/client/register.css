@@ -1,0 +1,521 @@
+/* ===================================================
+   CLIENT REGISTER PAGE STYLES
+   =================================================== */
+
+.register-page-wrapper {
+  max-width: 1100px;
+  margin: 40px auto 60px;
+  padding: 0 20px;
+}
+
+.register-container {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  border: 1px solid var(--client-border);
+}
+
+/* ================= LEFT SIDE: BENEFITS ================= */
+.register-benefits-panel {
+  background: linear-gradient(145deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%);
+  color: #ffffff;
+  padding: 48px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.register-benefits-panel::before {
+  content: "";
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+
+.register-benefits-panel::after {
+  content: "";
+  position: absolute;
+  bottom: -40px;
+  left: -40px;
+  width: 160px;
+  height: 160px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+}
+
+.benefits-header h2 {
+  font-size: 26px;
+  font-weight: 800;
+  margin: 0 0 10px 0;
+  line-height: 1.3;
+}
+
+.benefits-header p {
+  font-size: 14px;
+  color: #dbeafe;
+  line-height: 1.6;
+  margin: 0 0 32px 0;
+}
+
+.benefits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.benefit-icon-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.benefit-text h4 {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  color: #ffffff;
+}
+
+.benefit-text p {
+  font-size: 13px;
+  color: #bfdbfe;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.benefits-footer-quote {
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 13px;
+  color: #e2e8f0;
+  margin-top: 30px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ================= RIGHT SIDE: FORM ================= */
+.register-form-panel {
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.form-header-block {
+  margin-bottom: 28px;
+}
+
+.form-header-block h1 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+}
+
+.form-header-block p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+.form-header-block p a {
+  color: var(--client-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.form-header-block p a:hover {
+  text-decoration: underline;
+}
+
+/* Alert Notification */
+.register-alert {
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.register-alert-danger {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.register-alert-success {
+  background-color: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #047857;
+}
+
+/* Form Fields Grid */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-field-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.form-field-group label span.required {
+  color: #ef4444;
+}
+
+.form-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.form-input-icon {
+  position: absolute;
+  left: 12px;
+  color: #94a3b8;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.form-input-text {
+  width: 100%;
+  padding: 11px 14px 11px 38px;
+  font-size: 14px;
+  border: 1px solid var(--client-border);
+  border-radius: var(--client-radius-md);
+  outline: none;
+  background-color: #f8fafc;
+  color: #0f172a;
+  transition: var(--client-transition);
+}
+
+.form-input-text:focus {
+  background-color: #ffffff;
+  border-color: var(--client-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.form-input-text.has-error {
+  border-color: #ef4444;
+  background-color: #fffbfa;
+}
+
+.form-input-text.has-error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.btn-toggle-pwd {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.btn-toggle-pwd:hover {
+  color: #475569;
+}
+
+.field-error-msg {
+  font-size: 12px;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+/* Checkbox Terms */
+.form-checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: #475569;
+  cursor: pointer;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+.form-checkbox-label input[type="checkbox"] {
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--client-primary);
+  cursor: pointer;
+}
+
+.form-checkbox-label a {
+  color: var(--client-primary);
+  text-decoration: underline;
+}
+
+/* Submit Button */
+.btn-submit-register {
+  margin-top: 8px;
+  padding: 13px;
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--client-radius-md);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--client-transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+}
+
+.btn-submit-register:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+  transform: translateY(-1px);
+}
+
+.btn-submit-register:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Success Card View */
+.register-success-box {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.success-check-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #ecfdf5;
+  color: #059669;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  margin: 0 auto 20px;
+  border: 2px solid #a7f3d0;
+}
+
+.success-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 10px 0;
+}
+
+.success-desc {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.6;
+  max-width: 440px;
+  margin: 0 auto 26px;
+}
+
+.success-user-summary {
+  background-color: #f8fafc;
+  border: 1px solid var(--client-border);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: left;
+  margin-bottom: 26px;
+  font-size: 13px;
+}
+
+.success-user-summary p {
+  margin: 6px 0;
+  color: #334155;
+}
+
+.success-actions-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-success-primary {
+  padding: 11px 22px;
+  background-color: var(--client-primary);
+  color: #ffffff;
+  border-radius: var(--client-radius-md);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  transition: var(--client-transition);
+}
+
+.btn-success-primary:hover {
+  background-color: var(--client-primary-hover);
+}
+
+.btn-success-secondary {
+  padding: 11px 22px;
+  background-color: #f1f5f9;
+  color: #334155;
+  border-radius: var(--client-radius-md);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: var(--client-transition);
+}
+
+.btn-success-secondary:hover {
+  background-color: #e2e8f0;
+}
+
+/* ================= LOGIN SPECIFIC STYLES ================= */
+.login-container {
+  grid-template-columns: 1fr 1.15fr;
+}
+
+.login-demo-card {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 22px;
+  font-size: 13px;
+}
+
+.login-demo-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: #166534;
+  margin-bottom: 8px;
+}
+
+.login-demo-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #15803d;
+  margin-bottom: 10px;
+}
+
+.login-demo-content code {
+  background: #dcfce7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-weight: 600;
+  color: #14532d;
+}
+
+.btn-fill-demo {
+  background: #16a34a;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-fill-demo:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+.login-options-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 4px 0 10px 0;
+  font-size: 13px;
+}
+
+.forgot-password-link {
+  color: var(--client-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+
+.auth-switch-link {
+  color: var(--client-primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-switch-link:hover {
+  text-decoration: underline;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 900px) {
+  .register-container {
+    grid-template-columns: 1fr;
+  }
+  .register-benefits-panel {
+    padding: 32px 24px;
+  }
+  .register-form-panel {
+    padding: 32px 24px;
+  }
+  .form-row-2col {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}

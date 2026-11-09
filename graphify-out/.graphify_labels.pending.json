@@ -1,14 +1,15 @@
 {
   "0": "BackEnd/package.json",
-  "1": "next",
+  "1": "(client)/layout.jsx",
   "2": "FrontEnd/package.json",
-  "3": "costume.controller.js",
+  "3": "2. Kiến trúc BackEnd (Node.js & Express)",
   "4": "compilerOptions",
-  "5": "costume.route.js",
-  "6": "category.controller.js",
-  "7": "layout.tsx",
-  "8": "uploadToCloudinary.js",
-  "9": "scripts",
+  "5": "index.js",
+  "6": "admin/costume.controller.js",
+  "7": "app/context/AuthContext.jsx",
+  "8": "user.model.js",
+  "9": "react",
   "10": "README.md",
-  "11": "AGENTS.md"
+  "11": "AGENTS.md",
+  "12": "admin/layout.jsx"
 }

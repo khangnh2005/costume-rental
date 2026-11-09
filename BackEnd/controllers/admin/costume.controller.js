@@ -170,7 +170,13 @@ module.exports.deleteItem = async (req, res) => {
 module.exports.detail = async (req, res) => {
     try {
         const id = req.params.id;
-        const costume = await Costume.findOne({ _id: id, deleted: false });
+        let costume = null;
+        if (id && id.match(/^[0-9a-fA-F]{24}$/)) {
+            costume = await Costume.findOne({ _id: id, deleted: false });
+        }
+        if (!costume && id) {
+            costume = await Costume.findOne({ slug: id, deleted: false });
+        }
 
         if (!costume) {
             return res.status(404).json({
